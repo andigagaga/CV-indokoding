@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { User } from "./entity/User";
 import { Admin } from "./entity/Admin";
+import { Product } from "./entity/Product";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -9,10 +10,10 @@ export const AppDataSource = new DataSource({
   port: 3306,
   username: "root",
   password: "",
-  database: "CV Indokoding sukses makmur",
-  synchronize: false,
+  database: "guswandi-shoop",
+  synchronize: true,
   logging: false,
-  entities: [User, Admin],
+  entities: [User, Admin, Product],
   migrations: ["/src/migrations/*.ts"],
   subscribers: [],
 });

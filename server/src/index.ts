@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { AppDataSource } from "./data-source";
 import cors from "cors";
 import userRoute from "./route/user/UserAuthRoute";
+import productRouter from "./route/product/ProductRoute";
 
 AppDataSource.initialize()
   .then(async () => {
@@ -16,6 +17,7 @@ AppDataSource.initialize()
     app.use("api/v1", router);
 
     app.use("/api/v1", userRoute);
+    app.use("/api/v1", productRouter);
 
     app.get("/", (req: Request, res: Response) => {
       res.send("Express App is running!");
