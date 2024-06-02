@@ -2,20 +2,25 @@ import { View, Text, Image, StyleSheet, TextInput } from "react-native";
 import React from "react";
 import Colors from "../../Utils/Colors";
 import { FontAwesome } from "@expo/vector-icons";
+import { useSelector } from "react-redux";
 
 export default function Header() {
+  const authProfile = useSelector((state) => state.auth);
+
   return (
     <View style={styles.container}>
       {/* prpfile section */}
       <View style={styles.profileMainContainer}>
         <View style={styles.profileConatiner}>
           <Image
-            source={{ uri: "https://picsum.photos/101/101" }}
+            source={{ uri: authProfile.profile_picture }}
             style={styles.image}
           />
           <View>
             <Text style={{ color: Colors.WHITE }}>Welcome,</Text>
-            <Text style={{ color: Colors.WHITE, fontSize: 20 }}>Guswandi</Text>
+            <Text style={{ color: Colors.WHITE, fontSize: 20 }}>
+              {authProfile.username}
+            </Text>
           </View>
         </View>
         <FontAwesome name="bookmark-o" size={27} color="white" />

@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { Like, Repository } from "typeorm";
 import { Product } from "../../entity/Product";
 import { AppDataSource } from "../../data-source";
 import { Request, Response } from "express";
@@ -27,20 +27,20 @@ export default new (class ProductServices {
         });
       }
 
-      const titleFind = await this.productRepository.findOne({
-        where: { title: value.title },
-      });
+      // const titleFind = await this.productRepository.findOne({
+      //   where: { title: value.title },
+      // });
 
-      const descriptionFind = await this.productRepository.findOne({
-        where: { description: value.description },
-      });
+      // const descriptionFind = await this.productRepository.findOne({
+      //   where: { description: value.description },
+      // });
 
-      if (titleFind || descriptionFind) {
-        return res.status(400).json({
-          code: 400,
-          message: "PRODUCT ALREADY EXISTS",
-        });
-      }
+      // if (titleFind || descriptionFind) {
+      //   return res.status(400).json({
+      //     code: 400,
+      //     message: "PRODUCT ALREADY EXISTS",
+      //   });
+      // }
 
       // Upload image to cloudinary
       let cloudinary_image = "";
@@ -75,7 +75,15 @@ export default new (class ProductServices {
 
   async getAllProducts(req: Request, res: Response): Promise<Response> {
     try {
-      const products = await this.productRepository.find();
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
+      const offset = (page - 1) * limit;
+
+      const products = await this.productRepository.find({
+        order: { price: "DESC", posted_at: "DESC" },
+        skip: offset,
+        take: limit,
+      });
       return res.status(200).json({
         code: 200,
         message: "GET ALL PRODUCTS SUCCESS",
@@ -186,6 +194,34 @@ export default new (class ProductServices {
       return res.status(200).json({
         code: 200,
         message: "DELETE PRODUCT SUCCESS",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        code: 500,
+        message: "INTERNAL SERVER ERROR",
+        error: error.message,
+      });
+    }
+  }
+
+  async searchProducts(req: Request, res: Response): Promise<Response> {
+    try {
+      const { page = 1, limit = 5, search = "" } = req.query;
+      const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
+
+      const [product, count] = await this.productRepository.findAndCount({
+        where: { title: Like(`%${search}%`) },
+        order: { price: "DESC", posted_at: "DESC" },
+        skip: offset,
+        take: parseInt(limit as string),
+      });
+
+      return res.status(200).json({
+        code: 200,
+        message: "SEARCH PRODUCTS SUCCESS",
+        data: product,
+        total: count,
       });
     } catch (error) {
       console.log(error);

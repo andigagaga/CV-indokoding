@@ -6,6 +6,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { API_HOST } from "../../Utils/API/index.js";
 import { useNavigation } from "@react-navigation/native";
+import { AUTH_CHECK } from "../../redux/reducer/AuthSlice";
+import { useDispatch } from "react-redux";
 
 const profileMenu = [
   {
@@ -32,7 +34,10 @@ const profileMenu = [
 
 export default function ProfileScreen() {
   const [profileData, setProfileData] = useState(null);
+
+  console.log("data profile data", profileData);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -50,6 +55,13 @@ export default function ProfileScreen() {
           );
 
           setProfileData(response.data.data);
+          dispatch(
+            AUTH_CHECK({
+              username: response.data.data.username,
+              email: response.data.data.email,
+              profile_picture: response.data.data.profile_picture,
+            })
+          );
         }
       } catch (error) {
         console.error("Error fetching profile data:", error);

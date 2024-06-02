@@ -23,4 +23,6 @@ productRouter.put(
 
 productRouter.delete("/deleteProduct/:id", ProductController.deleteProduct);
 
+productRouter.get("/searchProducts", ProductController.searchProducts);
+
 export default productRouter;

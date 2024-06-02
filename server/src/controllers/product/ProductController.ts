@@ -24,4 +24,8 @@ export default new (class ProductController {
   deleteProduct = async (req: Request, res: Response): Promise<Response> => {
     return ProductServices.deleteProduct(req, res);
   };
+
+  searchProducts = async (req: Request, res: Response): Promise<Response> => {
+    return ProductServices.searchProducts(req, res);
+  };
 })();
