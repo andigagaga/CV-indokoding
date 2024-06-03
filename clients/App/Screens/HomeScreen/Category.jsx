@@ -1,11 +1,11 @@
+import React from "react";
 import {
-  View,
+  FlatList,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  StyleSheet,
-  FlatList,
+  View,
 } from "react-native";
-import React from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import categoriesData from "../../data/categories";
 

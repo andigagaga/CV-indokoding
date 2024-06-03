@@ -1,16 +1,17 @@
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
+  ActivityIndicator,
   FlatList,
   Image,
   StyleSheet,
-  ActivityIndicator,
+  Text,
+  View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import ContentData from "../../data/destinations.json";
-import axios from "axios";
 import { API_HOST } from "../../Utils/API/index.js";
 import Colors from "../../Utils/Colors";
+import { useSelector } from "react-redux";
+import { calculateTimeDifference } from "../../Utils/TimeUtils.js/TimeUtils.js";
 
 export default function Content() {
   const [products, setProducts] = useState([]);
@@ -18,10 +19,11 @@ export default function Content() {
   const [loading, setLoading] = useState(false);
   const [refresh, setRefreshing] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const searchTerm = useSelector((state) => state.search.searchTerm);
 
   useEffect(() => {
     getDataProducts();
-  }, []);
+  }, [searchTerm]);
 
   const getDataProducts = async () => {
     if (loading) return;
@@ -29,16 +31,35 @@ export default function Content() {
     setLoading(true);
 
     try {
-      const response = await axios.get(`${API_HOST.url}/api/v1/getAllProduct`, {
-        params: { page, limit: 5 },
-      });
+      let response;
+      if (searchTerm) {
+        // untuk mencari kunci pencarian
+        response = await axios.get(`${API_HOST.url}/api/v1/searchProducts`, {
+          params: { search: searchTerm },
+        });
+      } else {
+        // kalau ga ada kunci pencarian maka tampilkan smua products
+        response = await axios.get(`${API_HOST.url}/api/v1/getAllProduct`, {
+          params: { page, limit: 5 },
+        });
+      }
+
+      if (searchTerm) {
+        console.log("data yang cari", response.data.data);
+      }
+
       const newProducts = response.data.data;
 
-      setProducts((prevproducts) => {
+      setProducts((prevProducts) => {
         if (page === 1) {
-          return newProducts;
+          return newProducts; // Jika halaman pertama, langsung gunakan data baru
         } else {
-          return [...prevproducts, ...newProducts];
+          // Jika halaman lebih dari 1, gabungkan produk baru dengan produk sebelumnya
+          // Namun, pastikan produk hasil pencarian muncul di atas jika ada
+          const filteredNewProducts = prevProducts.filter(
+            (prod) => !newProducts.find((newProd) => newProd.id === prod.id)
+          );
+          return [...newProducts, ...filteredNewProducts]; // Data baru ditempatkan di paling atas
         }
       });
 
@@ -65,11 +86,11 @@ export default function Content() {
     <View style={styles.container}>
       <View key={item.id} style={styles.itemContainer}>
         <Image source={{ uri: item.image }} style={styles.image} />
-        <Text style={styles.name}>{item.name}</Text>
+        <Text style={styles.name}>{item.title}</Text>
         <Text style={styles.description}>{item.description}</Text>
-        <Text style={styles.details}>
-          Price : ${item.price} | Posted at : {""}
-          {new Date(item.posted_at).toLocaleString()}
+        <Text style={styles.price}>Rp.{item.price}</Text>
+        <Text style={{ ...styles.postedAt, color: "red" }}>
+          Posted at: {calculateTimeDifference(item.posted_at)}
         </Text>
       </View>
     </View>
@@ -110,20 +131,21 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   itemContainer: {
-    marginBottom: 10,
+    marginBottom: 20,
     padding: 10,
     backgroundColor: "#fff",
-    borderRadius: 8,
+    borderRadius: 10,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
+    shadowRadius: 5,
     elevation: 5,
   },
   image: {
     width: "100%",
     height: 200,
-    borderRadius: 8,
+    borderRadius: 10,
+    marginBottom: 10,
   },
   name: {
     fontSize: 18,
@@ -135,9 +157,14 @@ const styles = StyleSheet.create({
     color: "#555",
     marginTop: 5,
   },
-  details: {
+  price: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "green",
+    marginBottom: 5,
+  },
+  postedAt: {
     fontSize: 12,
     color: "#888",
-    marginTop: 5,
   },
 });

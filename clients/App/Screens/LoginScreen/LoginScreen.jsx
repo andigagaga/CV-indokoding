@@ -1,4 +1,6 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -7,10 +9,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Colors from "../../Utils/Colors";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
 import { API_HOST } from "../../Utils/API/index.js";
+import Colors from "../../Utils/Colors";
 
 export default function LoginScreen() {
   const navigation = useNavigation();

@@ -6,7 +6,7 @@ const destinationCategories = [
   },
   {
     id: 2,
-    title: "Beaches",
+    title: "Terbaru",
     iconName: "beach",
   },
   {

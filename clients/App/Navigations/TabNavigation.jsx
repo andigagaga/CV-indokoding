@@ -1,12 +1,11 @@
-import { View, Text } from "react-native";
-import React from "react";
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import React from "react";
+import { Text } from "react-native";
+import MyContentScreen from "../Screens/BookingScreen/MyContentScreen";
 import HomeScreen from "../Screens/HomeScreen/HomeScreen";
 import ProfileScreen from "../Screens/ProfileScreen/ProfileScreen";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
 import Colors from "../Utils/Colors";
-import MyContentScreen from "../Screens/BookingScreen/MyContentScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -20,7 +19,7 @@ export default function TabNavigation() {
       }}
     >
       <Tab.Screen
-        name="home"
+        name="Home"
         component={HomeScreen}
         options={{
           tabBarLabel: ({ color }) => (

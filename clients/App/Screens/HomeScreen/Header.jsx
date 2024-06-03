@@ -1,11 +1,19 @@
-import { View, Text, Image, StyleSheet, TextInput } from "react-native";
-import React from "react";
-import Colors from "../../Utils/Colors";
+import React, { useState } from "react";
+import { Image, StyleSheet, Text, TextInput, View } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import Colors from "../../Utils/Colors";
+import { setSearchTerm } from "../../redux/reducer/ProductSlice";
 
-export default function Header() {
+export default function Header({ showSearch }) {
+  const dispatch = useDispatch();
   const authProfile = useSelector((state) => state.auth);
+  const searchText = useSelector((state) => state.search.searchTerm);
+  const [searchInput, setSearchInput] = useState("");
+
+  const handleSearch = () => {
+    dispatch(setSearchTerm(searchInput)); // Dispatch the action directly
+  };
 
   return (
     <View style={styles.container}>
@@ -26,15 +34,23 @@ export default function Header() {
         <FontAwesome name="bookmark-o" size={27} color="white" />
       </View>
       {/* search bar section */}
-      <View style={styles.searchBarContainer}>
-        <TextInput style={styles.textInput} placeholder="Search" />
-        <FontAwesome
-          style={styles.searchBtn}
-          name="search"
-          size={24}
-          color={Colors.PRIMARY}
-        />
-      </View>
+      {showSearch && (
+        <View style={styles.searchBarContainer}>
+          <TextInput
+            style={styles.textInput}
+            placeholder="Search"
+            value={searchInput}
+            onChangeText={setSearchInput}
+          />
+          <FontAwesome
+            style={styles.searchBtn}
+            name="search"
+            size={24}
+            color={Colors.PRIMARY}
+            onPress={handleSearch}
+          />
+        </View>
+      )}
     </View>
   );
 }

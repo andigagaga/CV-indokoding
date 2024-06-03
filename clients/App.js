@@ -8,6 +8,7 @@ import SplaceScreen from "./App/Screens/SplaceScreen/SplaceScreen";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import RootReducer from "./App/redux/store";
+import MyContentScreen from "./App/Screens/BookingScreen/MyContentScreen";
 
 const Stack = createStackNavigator();
 
@@ -19,7 +20,7 @@ export default function App() {
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
+        <Stack.Navigator>
           <Stack.Screen
             name="Login"
             component={LoginScreen}
@@ -28,6 +29,11 @@ export default function App() {
           <Stack.Screen
             name="Register"
             component={RegisterScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="content"
+            component={MyContentScreen}
             options={{ headerShown: false }}
           />
           <Stack.Screen

@@ -1,13 +1,13 @@
-import { View, Text, Image, FlatList, TouchableOpacity } from "react-native";
-import React, { useEffect, useState } from "react";
-import Colors from "../../Utils/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import { API_HOST } from "../../Utils/API/index.js";
 import { useNavigation } from "@react-navigation/native";
-import { AUTH_CHECK } from "../../redux/reducer/AuthSlice";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { useDispatch } from "react-redux";
+import { API_HOST } from "../../Utils/API/index.js";
+import Colors from "../../Utils/Colors";
+import { AUTH_CHECK } from "../../redux/reducer/AuthSlice";
 
 const profileMenu = [
   {

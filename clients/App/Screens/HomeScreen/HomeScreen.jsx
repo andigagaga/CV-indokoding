@@ -1,13 +1,14 @@
-import { View, Text } from "react-native";
 import React from "react";
-import Header from "./Header";
-import Content from "./Content";
+import { View } from "react-native";
 import Category from "./Category";
+import Content from "./Content";
+import Header from "./Header";
 
 export default function HomeScreen() {
+  const showSearch = true;
   return (
-    <View>
-      <Header />
+    <View style={{ marginVertical: 30 }}>
+      <Header showSearch={showSearch} />
       <View style={{ padding: 20 }}>
         <Category />
       </View>

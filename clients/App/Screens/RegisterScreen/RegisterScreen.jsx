@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,8 +8,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Colors from "../../Utils/Colors";
 import { API_HOST } from "../../Utils/API/index.js";
+import Colors from "../../Utils/Colors";
+import * as ImagePicker from "expo-image-picker";
 
 export default function RegisterScreen() {
   const navigation = useNavigation();
@@ -21,6 +22,31 @@ export default function RegisterScreen() {
     profile_picture: null,
   });
 
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== "web") {
+        const { status } =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+          alert("Sorry, we need camera roll permissions to make this work!");
+        }
+      }
+    })();
+  }, []);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setFormData({ ...formData, image: result.assets[0].uri });
+    }
+  };
+
   const handleChange = (key, value) => {
     setFormData({ ...formData, [key]: value });
   };
@@ -30,6 +56,13 @@ export default function RegisterScreen() {
     form.append("username", formData.username);
     form.append("email", formData.email);
     form.append("password", formData.password);
+    if (formData.image) {
+      const localUri = formData.image;
+      const filename = localUri.split("/").pop();
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : `image`;
+      form.append("profile_picture", { uri: localUri, name: filename, type });
+    }
 
     try {
       const response = await axios.post(
@@ -42,11 +75,13 @@ export default function RegisterScreen() {
         }
       );
       console.log(response.data);
+      navigation.navigate("Login");
     } catch (error) {
       console.error(error);
     }
   };
 
+  console.log("data user", formData);
   return (
     <View style={styles.container}>
       <Text
@@ -78,6 +113,9 @@ export default function RegisterScreen() {
         onChangeText={(text) => handleChange("password", text)}
         secureTextEntry
       />
+      <TouchableOpacity style={styles.button} onPress={pickImage}>
+        <Text style={styles.buttonText}>Choose Profile Picture</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={{ color: Colors.WHITE, fontSize: 15, fontWeight: "bold" }}>
           Register
