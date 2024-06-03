@@ -1,9 +1,9 @@
-import { Like, Repository } from "typeorm";
-import { Product } from "../../entity/Product";
-import { AppDataSource } from "../../data-source";
 import { Request, Response } from "express";
-import { productCreateSchema } from "../../utils/validator/ProductValidator";
+import { Like, Repository } from "typeorm";
+import { AppDataSource } from "../../data-source";
+import { Product } from "../../entity/Product";
 import { uploadToCloudinary } from "../../utils/cloudinary/CloudinaryUploader";
+import { productCreateSchema } from "../../utils/validator/ProductValidator";
 
 export default new (class ProductServices {
   private readonly productRepository: Repository<Product> =
@@ -45,7 +45,7 @@ export default new (class ProductServices {
       // Upload image to cloudinary
       let cloudinary_image = "";
       if (req.file?.filename) {
-        cloudinary_image = await uploadToCloudinary(req.file);
+        cloudinary_image = await uploadToCloudinary(req.file.path);
       }
 
       // Create new product
@@ -80,7 +80,7 @@ export default new (class ProductServices {
       const offset = (page - 1) * limit;
 
       const products = await this.productRepository.find({
-        order: { price: "DESC", posted_at: "DESC" },
+        order: { posted_at: "DESC" },
         skip: offset,
         take: limit,
       });
@@ -156,7 +156,7 @@ export default new (class ProductServices {
 
       // If a new image is provided, upload it to Cloudinary and update the image field
       if (req.file) {
-        const cloudinary_image = await uploadToCloudinary(req.file);
+        const cloudinary_image = await uploadToCloudinary(req.file.path);
         productToUpdate.image = cloudinary_image;
       }
 
@@ -207,21 +207,17 @@ export default new (class ProductServices {
 
   async searchProducts(req: Request, res: Response): Promise<Response> {
     try {
-      const { page = 1, limit = 5, search = "" } = req.query;
-      const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
+      const { search = "" } = req.query;
 
-      const [product, count] = await this.productRepository.findAndCount({
+      const products = await this.productRepository.find({
         where: { title: Like(`%${search}%`) },
         order: { price: "DESC", posted_at: "DESC" },
-        skip: offset,
-        take: parseInt(limit as string),
       });
 
       return res.status(200).json({
         code: 200,
         message: "SEARCH PRODUCTS SUCCESS",
-        data: product,
-        total: count,
+        data: products,
       });
     } catch (error) {
       console.log(error);

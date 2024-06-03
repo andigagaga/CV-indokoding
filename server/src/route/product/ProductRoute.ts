@@ -7,7 +7,6 @@ const productRouter = Router();
 
 productRouter.post(
   "/product",
-  authMiddleware,
   upload.single("image"),
   ProductController.createProduct
 );

@@ -85,12 +85,16 @@ export default function Content() {
   const renderItem = ({ item }) => (
     <View style={styles.container}>
       <View key={item.id} style={styles.itemContainer}>
-        <Image source={{ uri: item.image }} style={styles.image} />
+        <Image
+          source={{ uri: item.image }}
+          style={styles.image}
+          resizeMode="cover"
+        />
         <Text style={styles.name}>{item.title}</Text>
         <Text style={styles.description}>{item.description}</Text>
-        <Text style={styles.price}>Rp.{item.price}</Text>
+        <Text style={styles.price}>Rp. {item.price.toLocaleString()}</Text>
         <Text style={{ ...styles.postedAt, color: "red" }}>
-          Posted at: {calculateTimeDifference(item.posted_at)}
+          Created at: {calculateTimeDifference(item.posted_at)}
         </Text>
       </View>
     </View>
@@ -128,7 +132,7 @@ export default function Content() {
 }
 const styles = StyleSheet.create({
   container: {
-    paddingBottom: 100,
+    paddingBottom: 70,
   },
   itemContainer: {
     marginBottom: 20,

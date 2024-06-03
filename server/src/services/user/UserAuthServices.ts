@@ -10,7 +10,6 @@ import {
   userRegisterSchema,
 } from "../../utils/validator/AuthValidator";
 import Env from "../../utils/variabel/Env";
-// import { uploadToCloudinary } from "../../utils/cloudinary/CloudinaryUploader";
 
 export default new (class AuthServices {
   private readonly authRepository: Repository<User> =
@@ -51,9 +50,9 @@ export default new (class AuthServices {
         });
       }
 
-      let cloudinary_profile_picture: string = "";
-      if (req.file?.filename) {
-        cloudinary_profile_picture = await uploadToCloudinary(req.file);
+      let cloudinary_profile_picture = "";
+      if (req.file) {
+        cloudinary_profile_picture = await uploadToCloudinary(req.file.path);
       }
       console.log(cloudinary_profile_picture, "cloudinary_profile_picture");
 
@@ -124,7 +123,7 @@ export default new (class AuthServices {
       }
 
       // Pastikan `username` ada di dalam `emailFind`
-      const token = await jwt.sign(
+      const token = jwt.sign(
         {
           id: emailFind.id,
           email: emailFind.email,
@@ -202,9 +201,11 @@ export default new (class AuthServices {
       userToUpdate.username = username;
       userToUpdate.email = email;
 
-      // jika ada profile yang di unggah, update juga profile picturenya
+      // jika ada profile yang diunggah, update juga profile picturenya
       if (req.file) {
-        const cloudinary_profile_picture = await uploadToCloudinary(req.file);
+        const cloudinary_profile_picture = await uploadToCloudinary(
+          req.file.path
+        );
         userToUpdate.profile_picture = cloudinary_profile_picture;
       }
 

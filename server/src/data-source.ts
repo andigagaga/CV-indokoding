@@ -13,7 +13,7 @@ export const AppDataSource = new DataSource({
   database: "cv indokoding sukses makmur",
   synchronize: true,
   logging: false,
-  entities: [User, Admin, Product],
+  entities: [User, Product],
   migrations: ["/src/migrations/*.ts"],
   subscribers: [],
 });

@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   StyleSheet,
   Text,
   TextInput,
@@ -14,6 +15,7 @@ import * as ImagePicker from "expo-image-picker";
 
 export default function RegisterScreen() {
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     username: "",
@@ -63,7 +65,7 @@ export default function RegisterScreen() {
       const type = match ? `image/${match[1]}` : `image`;
       form.append("profile_picture", { uri: localUri, name: filename, type });
     }
-
+    setLoading(true);
     try {
       const response = await axios.post(
         `${API_HOST.url}/api/v1/user/register`,
@@ -78,6 +80,8 @@ export default function RegisterScreen() {
       navigation.navigate("Login");
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -94,48 +98,56 @@ export default function RegisterScreen() {
       >
         Register
       </Text>
-      <TextInput
-        placeholder="Username"
-        style={styles.textInput}
-        value={formData.username}
-        onChangeText={(text) => handleChange("username", text)}
-      />
-      <TextInput
-        placeholder="Email"
-        style={styles.textInput}
-        value={formData.email}
-        onChangeText={(text) => handleChange("email", text)}
-      />
-      <TextInput
-        placeholder="Password"
-        style={styles.textInput}
-        value={formData.password}
-        onChangeText={(text) => handleChange("password", text)}
-        secureTextEntry
-      />
-      <TouchableOpacity style={styles.button} onPress={pickImage}>
-        <Text style={styles.buttonText}>Choose Profile Picture</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={{ color: Colors.WHITE, fontSize: 15, fontWeight: "bold" }}>
-          Register
-        </Text>
-      </TouchableOpacity>
-      <View>
-        <Text style={{ color: Colors.WHITE }}>Don't have an account?</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-          <Text
-            style={{
-              color: "green",
-              fontSize: 15,
-              fontWeight: "bold",
-              textDecorationLine: "underline",
-            }}
-          >
-            Login
-          </Text>
-        </TouchableOpacity>
-      </View>
+      {loading ? (
+        <ActivityIndicator size="large" color={Colors.WHITE} />
+      ) : (
+        <>
+          <TextInput
+            placeholder="Username"
+            style={styles.textInput}
+            value={formData.username}
+            onChangeText={(text) => handleChange("username", text)}
+          />
+          <TextInput
+            placeholder="Email"
+            style={styles.textInput}
+            value={formData.email}
+            onChangeText={(text) => handleChange("email", text)}
+          />
+          <TextInput
+            placeholder="Password"
+            style={styles.textInput}
+            value={formData.password}
+            onChangeText={(text) => handleChange("password", text)}
+            secureTextEntry
+          />
+          <TouchableOpacity style={styles.button} onPress={pickImage}>
+            <Text style={styles.buttonText}>Choose Profile Picture</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleRegister}>
+            <Text
+              style={{ color: Colors.WHITE, fontSize: 15, fontWeight: "bold" }}
+            >
+              Register
+            </Text>
+          </TouchableOpacity>
+          <View>
+            <Text style={{ color: Colors.WHITE }}>Don't have an account?</Text>
+            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+              <Text
+                style={{
+                  color: "green",
+                  fontSize: 15,
+                  fontWeight: "bold",
+                  textDecorationLine: "underline",
+                }}
+              >
+                Login
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
     </View>
   );
 }

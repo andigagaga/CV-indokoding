@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import Env from "../variabel/Env";
+import fs from "fs";
 
 cloudinary.config({
   cloud_name: Env.CLOUDINARY_CLOUD_NAME,
@@ -7,17 +8,22 @@ cloudinary.config({
   api_secret: Env.CLOUDINARY_API_SECRET,
 });
 
-// untuk unggah file ke cloudinary
-export const uploadToCloudinary = (
-  file: Express.Multer.File
-): Promise<string> => {
+export const uploadToCloudinary = (filePath: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     const opt = { folder: "E-COMMERCE-SHOOP" };
 
-    cloudinary.uploader.upload(file.path, opt, function (error, result) {
+    cloudinary.uploader.upload(filePath, opt, (error, result) => {
       if (error) {
         return reject(error);
       }
+
+      // Hapus file lokal setelah diunggah ke Cloudinary
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Failed to delete local file:", err);
+        }
+      });
+
       return resolve(result.secure_url);
     });
   });

@@ -20,10 +20,14 @@ export default function Header({ showSearch }) {
       {/* prpfile section */}
       <View style={styles.profileMainContainer}>
         <View style={styles.profileConatiner}>
-          <Image
-            source={{ uri: authProfile.profile_picture }}
-            style={styles.image}
-          />
+          {authProfile.profile_picture ? (
+            <Image
+              source={{ uri: authProfile.profile_picture }}
+              style={styles.image}
+            />
+          ) : (
+            <FontAwesome name="user-circle" size={27} color="white" />
+          )}
           <View>
             <Text style={{ color: Colors.WHITE }}>Welcome,</Text>
             <Text style={{ color: Colors.WHITE, fontSize: 20 }}>

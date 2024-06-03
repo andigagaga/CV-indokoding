@@ -4,6 +4,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
@@ -11,9 +12,11 @@ import { API_HOST } from "../../Utils/API/index.js";
 import { useNavigation } from "@react-navigation/native";
 import Header from "../HomeScreen/Header.jsx";
 import * as ImagePicker from "expo-image-picker";
+import Colors from "../../Utils/Colors.js";
 
 export default function MyContentScreen() {
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
   console.log("cek nav nya", navigation);
   const showSearch = false;
   const [formData, setFormData] = useState({
@@ -65,6 +68,7 @@ export default function MyContentScreen() {
       form.append("image", { uri: localUri, name: filename, type });
     }
 
+    setLoading(true);
     try {
       const response = await axios.post(
         `${API_HOST.url}/api/v1/product`,
@@ -81,6 +85,8 @@ export default function MyContentScreen() {
     } catch (error) {
       console.error(error);
       console.log(error.response.data);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,33 +95,40 @@ export default function MyContentScreen() {
       <Header showSearch={showSearch} />
       <View style={styles.content}>
         <Text style={styles.title}>Create Products</Text>
-        <View>
-          <TextInput
-            placeholder="Product Name"
-            style={styles.input}
-            value={formData.title}
-            onChangeText={(text) => handleChange("title", text)}
-          />
-          <TextInput
-            placeholder="Description"
-            style={styles.input}
-            value={formData.description}
-            onChangeText={(text) => handleChange("description", text)}
-          />
-          <TextInput
-            placeholder="Price"
-            style={styles.input}
-            value={formData.price}
-            onChangeText={(text) => handleChange("price", text)}
-          />
-          <TouchableOpacity style={styles.button} onPress={pickImage}>
-            <Text style={styles.buttonText}>Choose Image</Text>
-          </TouchableOpacity>
+        {loading ? (
+          <ActivityIndicator size={50} color={Colors.PRIMARY} />
+        ) : (
+          <View>
+            <TextInput
+              placeholder="Product Name"
+              style={styles.input}
+              value={formData.title}
+              onChangeText={(text) => handleChange("title", text)}
+            />
+            <TextInput
+              placeholder="Description"
+              style={styles.input}
+              value={formData.description}
+              onChangeText={(text) => handleChange("description", text)}
+            />
+            <TextInput
+              placeholder="Price"
+              style={styles.input}
+              value={formData.price}
+              onChangeText={(text) => handleChange("price", text)}
+            />
+            <TouchableOpacity style={styles.button} onPress={pickImage}>
+              <Text style={styles.buttonText}>Choose Image</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={handleCreateProduct}>
-            <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleCreateProduct}
+            >
+              <Text style={styles.buttonText}>Submit</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );

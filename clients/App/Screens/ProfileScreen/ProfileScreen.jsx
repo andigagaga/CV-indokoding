@@ -114,10 +114,14 @@ export default function ProfileScreen() {
             padding: 20,
           }}
         >
-          <Image
-            source={{ uri: profileData.profile_picture }}
-            style={{ width: 90, height: 90, borderRadius: 99 }}
-          />
+          {profileData.profile_picture ? (
+            <Image
+              source={{ uri: profileData.profile_picture }}
+              style={{ width: 90, height: 90, borderRadius: 99 }}
+            />
+          ) : (
+            <Ionicons name="person-circle" size={90} color={Colors.WHITE} />
+          )}
           <Text
             style={{
               fontSize: 26,

@@ -3,6 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   StyleSheet,
   Text,
   TextInput,
@@ -11,9 +12,13 @@ import {
 } from "react-native";
 import { API_HOST } from "../../Utils/API/index.js";
 import Colors from "../../Utils/Colors";
+import { useDispatch } from "react-redux";
+import { AUTH_CHECK } from "../../redux/reducer/AuthSlice.js";
 
 export default function LoginScreen() {
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({ email: "", password: "" });
 
@@ -22,6 +27,7 @@ export default function LoginScreen() {
   };
 
   const handleLogin = async () => {
+    setLoading(true);
     try {
       const response = await axios.post(
         `${API_HOST.url}/api/v1/user/login`,
@@ -30,6 +36,13 @@ export default function LoginScreen() {
 
       // Simpan token ke AsyncStorage
       await AsyncStorage.setItem("token", response.data.token);
+
+      dispatch(
+        AUTH_CHECK({
+          email: response.data.email,
+          profile_picture: response.data.profile_picture,
+        })
+      );
       // Handle response dari server di sini
       console.log(response.data);
 
@@ -38,6 +51,8 @@ export default function LoginScreen() {
     } catch (error) {
       // Handle error di sini
       console.error("Error during login:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,40 +66,48 @@ export default function LoginScreen() {
           marginBottom: 20,
         }}
       >
-        Logins
+        Login
       </Text>
-      <TextInput
-        placeholder="Email"
-        style={styles.textInput}
-        value={formData.email}
-        onChangeText={(e) => handleChange("email", e)}
-      />
-      <TextInput
-        placeholder="Password"
-        style={styles.textInput}
-        value={formData.password}
-        onChangeText={(e) => handleChange("password", e)}
-      />
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={{ color: Colors.WHITE, fontSize: 15, fontWeight: "bold" }}>
-          Login
-        </Text>
-      </TouchableOpacity>
-      <View>
-        <Text style={{ color: Colors.WHITE }}>Don't have an account?</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-          <Text
-            style={{
-              color: "red",
-              fontSize: 15,
-              fontWeight: "bold",
-              textDecorationLine: "underline",
-            }}
-          >
-            Register
-          </Text>
-        </TouchableOpacity>
-      </View>
+      {loading ? (
+        <ActivityIndicator size="large" color={Colors.WHITE} />
+      ) : (
+        <>
+          <TextInput
+            placeholder="Email"
+            style={styles.textInput}
+            value={formData.email}
+            onChangeText={(e) => handleChange("email", e)}
+          />
+          <TextInput
+            placeholder="Password"
+            style={styles.textInput}
+            value={formData.password}
+            onChangeText={(e) => handleChange("password", e)}
+          />
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <Text
+              style={{ color: Colors.WHITE, fontSize: 15, fontWeight: "bold" }}
+            >
+              Login
+            </Text>
+          </TouchableOpacity>
+          <View>
+            <Text style={{ color: Colors.WHITE }}>Don't have an account?</Text>
+            <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+              <Text
+                style={{
+                  color: "red",
+                  fontSize: 15,
+                  fontWeight: "bold",
+                  textDecorationLine: "underline",
+                }}
+              >
+                Register
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
     </View>
   );
 }
